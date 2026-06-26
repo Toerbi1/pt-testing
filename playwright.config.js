@@ -16,7 +16,10 @@ export default defineConfig({
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: BASE_URL,
+    // Debugging artifacts captured into test-results/ when something goes wrong.
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
   projects: [
     {
