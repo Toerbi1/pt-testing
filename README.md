@@ -65,8 +65,45 @@ The server starts on **http://localhost:3000**.
 | `npm start` | Start the server |
 | `npm run dev` | Start with auto-restart on file changes |
 | `npm run seed` | Wipe the database and re-seed with example data |
+| `npm test` | Run all Vitest suites (unit + API + integration) |
+| `npm run test:unit` | Run unit tests only |
+| `npm run test:api` | Run API tests only |
+| `npm run test:integration` | Run integration tests only |
+| `npm run test:e2e` | Run Playwright end-to-end tests |
+| `npm run test:all` | Run Vitest suites, then the E2E tests |
 
 > Run `npm run seed` before each testing session to reset the database to a known, clean state.
+
+---
+
+## Test automation (Group 4 — Returning & Availability)
+
+Automated tests cover the return process and its effects on fees, availability and reservations.
+
+| Layer | Tool | Location |
+|-------|------|----------|
+| Unit | Vitest | `tests/unit/` — late-fee calculation |
+| API | Vitest + supertest | `tests/api/` — return / fee / availability HTTP contracts |
+| Integration | Vitest + supertest | `tests/integration/` — borrow→return cycle, reservation promotion |
+| E2E | Playwright | `tests/e2e/` — returning a book through the web UI |
+
+Vitest runs against an **in-memory SQLite database** (`NODE_ENV=test`, see `src/db.js`),
+so the suites never touch `library.db`. Playwright re-seeds the database and starts the
+real server automatically (`playwright.config.js`).
+
+```bash
+# One-time: install the Playwright browser
+npx playwright install chromium
+
+npm test          # unit + API + integration (fast, no browser)
+npm run test:e2e  # browser end-to-end tests
+```
+
+### CI/CD
+
+`.github/workflows/ci.yml` runs the full suite automatically on every push and pull
+request to the main branch: a fast Vitest job (unit → API → integration) followed by a
+Playwright E2E job that uploads its HTML report as a build artifact.
 
 ---
 
